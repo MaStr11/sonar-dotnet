@@ -16,4 +16,14 @@
 
 namespace SonarAnalyzer.Core.Common;
 
-public readonly record struct NodeAndModel<TSyntax>(TSyntax Node, SemanticModel Model) where TSyntax : SyntaxNode;
+public class NodeAndModel<TSyntax> where TSyntax : SyntaxNode
+{
+    public SemanticModel Model { get; }
+    public TSyntax Node { get; }
+
+    public NodeAndModel(SemanticModel model, TSyntax node)
+    {
+        Model = model;
+        Node = node;
+    }
+}

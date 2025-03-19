@@ -78,7 +78,7 @@ public sealed class FieldShouldBeReadonly : SonarDiagnosticAnalyzer
                 var partialDeclarations = declaredSymbol.DeclaringSyntaxReferences
                     .Select(reference => reference.GetSyntax())
                     .OfType<TypeDeclarationSyntax>()
-                    .Select(x => new TypeDeclarationTuple(x, c.Compilation.GetSemanticModel(x.SyntaxTree)))
+                    .Select(x => new TypeDeclarationTuple(c.Compilation.GetSemanticModel(x.SyntaxTree), x))
                     .Where(x => x.Model is not null);
 
                 var fieldCollector = new ReadonlyFieldCollector(partialDeclarations);
@@ -164,7 +164,7 @@ public sealed class FieldShouldBeReadonly : SonarDiagnosticAnalyzer
 
             private IEnumerable<FieldTuple> GetAllFields(FieldDeclarationSyntax fieldDeclaration) =>
                 fieldDeclaration.Declaration.Variables
-                    .Select(x => new FieldTuple(x, partialTypeDeclaration.Model.GetDeclaredSymbol(x) as IFieldSymbol, partialTypeDeclaration.Model));
+                    .Select(x => new FieldTuple(partialTypeDeclaration.Model, x, partialTypeDeclaration.Model.GetDeclaredSymbol(x) as IFieldSymbol));
 
             private void CollectFieldsFromDeclarations()
             {
