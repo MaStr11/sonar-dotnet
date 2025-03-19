@@ -115,10 +115,6 @@ public static class IOperationExtensions
     public static IFlowCaptureReferenceOperationWrapper? AsFlowCaptureReference(this IOperation operation) =>
         operation.As(OperationKindEx.FlowCaptureReference, IFlowCaptureReferenceOperationWrapper.FromOperation);
 
-    // Other LoopKinds (e.g. For, While) are still OperationKindEx.Loop, but cannot be cast to IForEachLoopOperationWrapper so we need an additional check
-    public static IForEachLoopOperationWrapper? AsForEachLoop(this IOperation operation) =>
-        IForEachLoopOperationWrapper.IsInstance(operation) ? IForEachLoopOperationWrapper.FromOperation(operation) : null;
-
     public static IInvocationOperationWrapper? AsInvocation(this IOperation operation) =>
         operation.As(OperationKindEx.Invocation, IInvocationOperationWrapper.FromOperation);
 
@@ -152,17 +148,11 @@ public static class IOperationExtensions
     public static ITupleOperationWrapper? AsTuple(this IOperation operation) =>
         operation.As(OperationKindEx.Tuple, ITupleOperationWrapper.FromOperation);
 
-    public static IVariableDeclaratorOperationWrapper? AsVariableDeclarator(this IOperation operation) =>
-        operation.As(OperationKindEx.VariableDeclarator, IVariableDeclaratorOperationWrapper.FromOperation);
-
     public static IAwaitOperationWrapper ToAwait(this IOperation operation) =>
         IAwaitOperationWrapper.FromOperation(operation);
 
     public static IArgumentOperationWrapper ToArgument(this IOperation operation) =>
         IArgumentOperationWrapper.FromOperation(operation);
-
-    public static IArrayCreationOperationWrapper ToArrayCreation(this IOperation operation) =>
-        IArrayCreationOperationWrapper.FromOperation(operation);
 
     public static IAssignmentOperationWrapper ToAssignment(this IOperation operation) =>
         IAssignmentOperationWrapper.FromOperation(operation);
@@ -200,20 +190,11 @@ public static class IOperationExtensions
     public static IFlowCaptureReferenceOperationWrapper ToFlowCaptureReference(this IOperation operation) =>
         IFlowCaptureReferenceOperationWrapper.FromOperation(operation);
 
-    public static IForEachLoopOperationWrapper ToForEachLoop(this IOperation operation) =>
-        IForEachLoopOperationWrapper.FromOperation(operation);
-
-    public static ILoopOperationWrapper ToLoop(this IOperation operation) =>
-        ILoopOperationWrapper.FromOperation(operation);
-
     public static IIncrementOrDecrementOperationWrapper ToIncrementOrDecrement(this IOperation operation) =>
         IIncrementOrDecrementOperationWrapper.FromOperation(operation);
 
     public static IInvocationOperationWrapper ToInvocation(this IOperation operation) =>
         IInvocationOperationWrapper.FromOperation(operation);
-
-    public static IIsTypeOperationWrapper ToIsType(this IOperation operation) =>
-        IIsTypeOperationWrapper.FromOperation(operation);
 
     public static ILocalReferenceOperationWrapper ToLocalReference(this IOperation operation) =>
         ILocalReferenceOperationWrapper.FromOperation(operation);
@@ -250,12 +231,6 @@ public static class IOperationExtensions
 
     public static IUnaryOperationWrapper ToUnary(this IOperation operation) =>
         IUnaryOperationWrapper.FromOperation(operation);
-
-    public static IVariableDeclarationOperationWrapper ToVariableDeclaration(this IOperation operation) =>
-        IVariableDeclarationOperationWrapper.FromOperation(operation);
-
-    public static IVariableDeclaratorOperationWrapper ToVariableDeclarator(this IOperation operation) =>
-        IVariableDeclaratorOperationWrapper.FromOperation(operation);
 
     public static IOperation UnwrapConversion(this IOperation operation)
     {

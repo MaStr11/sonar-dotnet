@@ -107,20 +107,20 @@ namespace SonarAnalyzer.CSharp.Rules
             containingMethod.DescendantNodes()
                 .OfType<InvocationExpressionSyntax>()
                 .Where(x => semanticModel.GetSymbolInfo(x.Expression).Symbol is IMethodSymbol methodSymbol && invocationSymbol.Equals(methodSymbol))
-                .Select(x => new NodeSymbolAndModel(x, invocationSymbol, semanticModel))
+                .Select(x => new NodeSymbolAndModel(semanticModel, x, invocationSymbol))
                 .ToList();
 
         private static IEnumerable<NodeSymbolAndModel> FilterInvocations(NodeAndModel<BaseTypeDeclarationSyntax> container) =>
             container.Node.DescendantNodes()
                 .OfType<InvocationExpressionSyntax>()
-                .Select(x => new NodeSymbolAndModel(x, container.Model.GetSymbolInfo(x).Symbol as IMethodSymbol, container.Model))
+                .Select(x => new NodeSymbolAndModel(container.Model, x, container.Model.GetSymbolInfo(x).Symbol as IMethodSymbol))
                 .Where(x => x.Symbol != null);
 
         private static IEnumerable<NodeSymbolAndModel<MethodDeclarationSyntax, IMethodSymbol>> CollectRemovableMethods(CSharpRemovableDeclarationCollector removableDeclarationCollector) =>
                 removableDeclarationCollector.TypeDeclarations
                     .SelectMany(container => container.Node.DescendantNodes(CSharpRemovableDeclarationCollector.IsNodeContainerTypeDeclaration)
                         .OfType<MethodDeclarationSyntax>()
-                        .Select(x => new NodeSymbolAndModel<MethodDeclarationSyntax, IMethodSymbol>(x, container.Model.GetDeclaredSymbol(x), container.Model)))
+                        .Select(x => new NodeSymbolAndModel<MethodDeclarationSyntax, IMethodSymbol>(container.Model, x, container.Model.GetDeclaredSymbol(x))))
                         .Where(x => x.Symbol is { ReturnsVoid: false, IsAsync: false } && CSharpRemovableDeclarationCollector.IsRemovable(x.Symbol, Accessibility.Private));
     }
 }
