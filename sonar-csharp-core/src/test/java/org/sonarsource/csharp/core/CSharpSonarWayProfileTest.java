@@ -19,7 +19,6 @@ package org.sonarsource.csharp.core;
 import com.sonar.plugins.security.api.CsRules;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,6 @@ import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition.BuiltInQual
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition.Context;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition.NewBuiltInQualityProfile;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
-import org.sonar.plugins.csharpenterprise.api.ProfileRegistrar;
 import org.sonarsource.dotnet.shared.plugins.PluginMetadata;
 import org.sonarsource.dotnet.shared.plugins.RoslynRules;
 
@@ -159,22 +157,5 @@ class CSharpSonarWayProfileTest {
     sonarWay.define(context);
 
     assertThat(logTester.logs(Level.DEBUG)).hasSize(1);
-  }
-
-  @Test
-  void profileRegistrars_registerRules() {
-    Context context = new Context();
-    ProfileRegistrar[] profileRegistrars = new ProfileRegistrar[]{
-      registrarContext -> {
-        registrarContext.registerDefaultQualityProfileRules(
-          List.of(RuleKey.of(metadata.repositoryKey(), "additionalRule"))
-        );
-      }};
-    CSharpSonarWayProfile sonarWay = new CSharpSonarWayProfile(metadata, roslynRules, profileRegistrars);
-    sonarWay.define(context);
-
-    BuiltInQualityProfile builtIn = context.profile("cs", "Sonar way");
-    assertThat(builtIn.language()).isEqualTo(metadata.languageKey());
-    assertThat(builtIn.rule(RuleKey.of(metadata.repositoryKey(), "additionalRule"))).isNotNull();
   }
 }

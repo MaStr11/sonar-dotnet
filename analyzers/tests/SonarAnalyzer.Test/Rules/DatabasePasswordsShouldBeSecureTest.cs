@@ -61,12 +61,17 @@ namespace SonarAnalyzer.Test.Rules
                 .Verify();
 
         [DataTestMethod]
-        [DataRow(true, @"TestCases\WebConfig\DatabasePasswordsShouldBeSecure\Values")]
-        [DataRow(false, @"TestCases\WebConfig\DatabasePasswordsShouldBeSecure\UnexpectedContent")]
-        public void DatabasePasswordsShouldBeSecure_CS_WebConfig(bool expectIssues, string root)
+        [DataRow(@"TestCases\WebConfig\DatabasePasswordsShouldBeSecure\Values")]
+        [DataRow(@"TestCases\WebConfig\DatabasePasswordsShouldBeSecure\UnexpectedContent")]
+        public void DatabasePasswordsShouldBeSecure_CS_WebConfig(string root)
         {
             var webConfigPath = GetWebConfigPath(root);
-            VerifyAdditionalFiles(expectIssues, webConfigPath);
+            DiagnosticVerifier.Verify(
+                CreateCompilation(),
+                new DatabasePasswordsShouldBeSecure(),
+                AnalysisScaffolding.CreateSonarProjectConfigWithFilesToAnalyze(TestContext, webConfigPath),
+                null,
+                [webConfigPath]);
         }
 
         [TestMethod]
@@ -75,7 +80,12 @@ namespace SonarAnalyzer.Test.Rules
             var root = @"TestCases\WebConfig\DatabasePasswordsShouldBeSecure\ExternalConfig";
             var webConfigPath = GetWebConfigPath(root);
             var externalConfigPath = Path.Combine(root, "external.config");
-            VerifyAdditionalFiles(false, webConfigPath, externalConfigPath);
+            DiagnosticVerifier.Verify(
+                CreateCompilation(),
+                new DatabasePasswordsShouldBeSecure(),
+                AnalysisScaffolding.CreateSonarProjectConfigWithFilesToAnalyze(TestContext, webConfigPath, externalConfigPath),
+                null,
+                [webConfigPath]);
         }
 
         [TestMethod]
@@ -84,24 +94,34 @@ namespace SonarAnalyzer.Test.Rules
             var root = @"TestCases\WebConfig\DatabasePasswordsShouldBeSecure\Corrupt";
             var missingDirectory = @"TestCases\WebConfig\DatabasePasswordsShouldBeSecure\NonExistingDirectory";
             var corruptFilePath = GetWebConfigPath(root);
-            var nonExistentFilePath = GetWebConfigPath(missingDirectory);
-            VerifyAdditionalFiles(false, corruptFilePath, nonExistentFilePath);
+            var nonExistingFilePath = GetWebConfigPath(missingDirectory);
+            DiagnosticVerifier.Verify(
+                CreateCompilation(),
+                new DatabasePasswordsShouldBeSecure(),
+                AnalysisScaffolding.CreateSonarProjectConfigWithFilesToAnalyze(TestContext, corruptFilePath, nonExistingFilePath),
+                null,
+                [corruptFilePath]);
         }
 
         [DataTestMethod]
-        [DataRow(true, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\Values")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\ArrayInside")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\EmptyArray")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\EmptyFile")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\WrongStructure")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\ConnectionStringComment")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\ValueKind")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\PropertyKinds")]
-        [DataRow(false, @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\Null")]
-        public void DatabasePasswordsShouldBeSecure_CS_AppSettings(bool expectIssues, string root)
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\Values")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\ArrayInside")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\EmptyArray")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\EmptyFile")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\WrongStructure")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\ConnectionStringComment")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\ValueKind")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\PropertyKinds")]
+        [DataRow(@"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\UnexpectedContent\Null")]
+        public void DatabasePasswordsShouldBeSecure_CS_AppSettings(string root)
         {
             var appSettingsPath = GetAppSettingsPath(root);
-            VerifyAdditionalFiles(expectIssues, appSettingsPath);
+            DiagnosticVerifier.Verify(
+                CreateCompilation(),
+                new DatabasePasswordsShouldBeSecure(),
+                AnalysisScaffolding.CreateSonarProjectConfigWithFilesToAnalyze(TestContext, appSettingsPath),
+                null,
+                [appSettingsPath]);
         }
 
         [TestMethod]
@@ -110,29 +130,20 @@ namespace SonarAnalyzer.Test.Rules
             var root = @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\Corrupt";
             var missingDirectory = @"TestCases\AppSettings\DatabasePasswordsShouldBeSecure\NonExistingDirectory";
             var corruptFilePath = GetAppSettingsPath(root);
-            var nonExistentFilePath = GetAppSettingsPath(missingDirectory);
-            VerifyAdditionalFiles(false, corruptFilePath, nonExistentFilePath);
+            var nonExistingFilePath = GetAppSettingsPath(missingDirectory);
+            DiagnosticVerifier.Verify(
+                CreateCompilation(),
+                new DatabasePasswordsShouldBeSecure(),
+                AnalysisScaffolding.CreateSonarProjectConfigWithFilesToAnalyze(TestContext, corruptFilePath, nonExistingFilePath),
+                null,
+                [corruptFilePath]);
         }
 
         private static string GetWebConfigPath(string rootFolder) => Path.Combine(rootFolder, "Web.config");
 
         private static string GetAppSettingsPath(string rootFolder) => Path.Combine(rootFolder, "appsettings.json");
 
-        private void VerifyAdditionalFiles(bool expectIssues, string additionalSourceFile, params string[] additionalFilesToAnalyze)
-        {
-            var withAdditionalSourceFiles = builder
-                .AddSnippet("// Nothing to see here")
-                .WithAdditionalFilePath(AnalysisScaffolding.CreateSonarProjectConfigWithFilesToAnalyze(TestContext, additionalFilesToAnalyze.Append(additionalSourceFile).ToArray()))
-                .AddAdditionalSourceFiles(additionalSourceFile);
-            if (expectIssues)
-            {
-                withAdditionalSourceFiles.Verify();
-            }
-            else
-            {
-                withAdditionalSourceFiles.VerifyNoIssues();
-            }
-        }
+        private static Compilation CreateCompilation() => SolutionBuilder.Create().AddProject(AnalyzerLanguage.CSharp).GetCompilation();
 
         private static IEnumerable<MetadataReference> GetReferences(string entityFrameworkCoreVersion, string oracleVersion) =>
             Enumerable.Empty<MetadataReference>()

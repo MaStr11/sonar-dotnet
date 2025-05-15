@@ -58,7 +58,8 @@ public class Sample
     public void FluentAssertions()
     {
         builder.Should().BeSomething()
-            .And.BeSomething().And.BeSomething();
+            .And.BeSomething().And.BeSomething();   // Noncompliant
+        //                    ^^^^
         builder.Should().BeSomething()
             .And.BeSomething()
             .And            // Allowed
@@ -66,14 +67,6 @@ public class Sample
         builder.Build("Something long")
             .Should().BeSomething();
 
-        builder
-            .And.Variable.Should().BeSomething();
-        builder
-            .And.Variable.Build().Should().BeSomething();
-        builder
-            .Subject.Variable.Should().BeSomething();
-        builder
-            .Which.Variable.Should().BeSomething();
     }
 
     public void ConditionalAccess()
@@ -134,9 +127,7 @@ public class Builder
     public bool IsTrue() => true;
 
     // FluentAssertions-like methods
-    public Builder And => null;
-    public Builder Which => null;
-    public Builder Subject => null;
+    public Builder And => null; // Special case to simulate FluentAssertions API
     public Builder Should() => null;
     public Builder BeSomething() => null;
 

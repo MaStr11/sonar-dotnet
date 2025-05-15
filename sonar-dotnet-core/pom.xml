@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonarsource.dotnet</groupId>
     <artifactId>sonar-dotnet</artifactId>
-    <version>10.11-SNAPSHOT</version>
+    <version>10.10-SNAPSHOT</version>
   </parent>
 
   <artifactId>sonar-dotnet-core</artifactId>
@@ -15,7 +15,7 @@
   <description>Share code between C# and VB.NET plugins</description>
 
   <properties>
-    <protobuf.version>4.31.0</protobuf.version>
+    <protobuf.version>4.30.2</protobuf.version>
     <protobuf.compiler>${settings.localRepository}/com/google/protobuf/protoc/${protobuf.version}/protoc-${protobuf.version}-${os.detected.classifier}.exe</protobuf.compiler>
     <sonar.exclusions>target/generated-sources/protobuf/**</sonar.exclusions>
   </properties>

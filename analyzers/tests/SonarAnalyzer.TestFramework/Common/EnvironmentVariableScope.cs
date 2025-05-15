@@ -22,6 +22,7 @@ namespace SonarAnalyzer.TestFramework.Common;
 /// </summary>
 public sealed class EnvironmentVariableScope : IDisposable
 {
+    private readonly bool setOnlyInAzureDevOpsContext;
     private IDictionary<string, string> originalValues = new Dictionary<string, string>();
 
 #pragma warning disable S2376 // Write-only properties should not be used
@@ -31,8 +32,15 @@ public sealed class EnvironmentVariableScope : IDisposable
     }
 #pragma warning restore S2376
 
+    public EnvironmentVariableScope(bool setVariablesOnlyInAzureDevOpsContext = true) =>
+        setOnlyInAzureDevOpsContext = setVariablesOnlyInAzureDevOpsContext;
+
     public void SetVariable(string name, string value)
     {
+        if (setOnlyInAzureDevOpsContext && !TestEnvironment.IsAzureDevOpsContext)
+        {
+            return;
+        }
         // Store the original value, or null if there isn't one
         if (!originalValues.ContainsKey(name))
         {
