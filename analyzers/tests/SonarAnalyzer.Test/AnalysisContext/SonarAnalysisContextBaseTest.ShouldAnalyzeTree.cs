@@ -176,23 +176,27 @@ public partial class SonarAnalysisContextBaseTest
     [DataRow("Windows Form Designer GeNeRaTed code")] // legacy Windows Forms used to include generated code in dev files, surrounded by such a region
     public void ShouldAnalyzeTree_IssuesRaisedOnPartiallyGenerated_LegacyWinFormsFile(string regionName)
     {
-        new VerifierBuilder<CS.EmptyStatement>()
-            .AddSnippet($$"""
-                class Sample
+        var content = $$"""
+            class Sample
+            {
+                void HandWrittenEventHandler()
                 {
-                    void HandWrittenEventHandler()
-                    {
-                        ; // Noncompliant
-                    }
-                #region {{regionName}}
-                    void GeneratedStuff()
-                    {
-                        ; // Noncompliant
-                    }
-                #endregion
+                    ; // Noncompliant
                 }
-                """)
-            .Verify();
+            #region {{regionName}}
+                void GeneratedStuff()
+                {
+                    ; // Noncompliant
+                }
+            #endregion
+            }
+            """;
+        var compilation = SolutionBuilder
+           .Create()
+           .AddProject(AnalyzerLanguage.CSharp)
+           .AddSnippet(content, "Foo.cs")
+           .GetCompilation();
+        DiagnosticVerifier.Verify(compilation, new CS.EmptyStatement());
     }
 
     [TestMethod]

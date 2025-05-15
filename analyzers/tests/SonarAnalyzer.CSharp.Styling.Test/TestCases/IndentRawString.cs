@@ -62,31 +62,6 @@ public class Sample
         Good
         """;
 
-    public object ArrowInInvocationArgument() =>
-        Invocation("""
-            Good
-            """);
-
-    public object ArrowInConstructorArgument() =>
-        new Exception("""
-            Good
-            """);
-
-    public Exception ArrowInConstructorArgumentImplicit() =>
-        new("""
-            Good
-            """);
-
-    public object ArrowBuilderArgument() =>
-        new Builder()
-            .Build("""
-                Good
-                """)
-            .Build("""
-            Too close
-            """);       // Noncompliant
-
-
     public string ReturnNoncompliant()
     {
         return """
@@ -112,19 +87,6 @@ public class Sample
         get => """
             Good
             """;
-    }
-
-    public void Assignment()
-    {
-        _ = Invocation("""
-            Good
-            """);
-        _ = Invocation("""
-        Too close
-        """);       // Noncompliant
-        _ = Invocation("""
-                Too far
-                """);       // Noncompliant
     }
 
     public void Invocations()
@@ -157,17 +119,17 @@ public class Sample
             """);
         // This is bad already for other reasons
         Invocation(Invocation(Invocation("""
-        Too close
-        """,            // Noncompliant {{Indent this raw string literal at line position 13.}}
-            """
-            Good
-            """, """
-                Too far
-                """))); // Noncompliant
+                            Too close
+                            """,            // Noncompliant {{Indent this raw string literal at line position 33.}}
+                                """
+                                Good
+                                """, """
+                                    Too far
+                                    """))); // Noncompliant
         // This is bad already for other reasons
         Invocation(Invocation(Invocation("""
-            Good
-            """)));
+                                Good
+                                """)));
 
         Invocation(
             Invocation("""
@@ -192,24 +154,11 @@ public class Sample
             """);
 
         Invocation(Invocation(Invocation(   // This is bad already for other reasons
-            """
-            Good
-            """, """
-            Good
-            """)));
-    }
-
-    public void ObjectInitializer()
-    {
-        _ = new WithProperty
-        {
-            First = """
-                Good
-                """,
-            Second = """
-            Good
-            """,        // Noncompliant
-        };
+                                """
+                                Good
+                                """, """
+                                Good
+                                """)));
     }
 
     public void Lambdas(int[] list)
@@ -289,113 +238,10 @@ public class Sample
         }
     }
 
-    public void ConditionalAccess(Builder builder)
-    {
-        builder?
-            .Build("""
-                Good
-                """, """
-                    Too Far
-                    """);           // Noncompliant
-
-        builder?
-            .Build("""
-                Good
-                """, """
-                    Too Far
-                    """)?           // Noncompliant
-            .Build("""
-                Good
-                """, """
-                    Too Far
-                    """);           // Noncompliant
-        builder?.Build()?.Build("""
-            Good
-            """, """
-                Too Far
-                """);               // Noncompliant
-    }
-
-    public void SwitchExpressions(object arg)
-    {
-        _ = arg switch
-        {
-            ArgumentException someLongerName => """
-                Good
-                """,
-            Exception someLongerName => """
-            Too close
-            """,                    // Noncompliant
-            _ => """
-                Good
-                """
-        };
-    }
-
-    public void Throw(bool condition, object arg)
-    {
-        _ = arg ?? new Exception("""
-            Good
-            """);
-        if (condition)
-        {
-            throw new Exception("""
-                Good
-                """);
-        }
-        else
-        {
-            throw new ArgumentException("""
-            Too close
-            """,            // Noncompliant
-                    """
-                    Too far
-                    """);   // Noncompliant
-
-        }
-    }
-
-    public void Builders()
-    {
-        //EqualsValue
-        var builder = new Builder("""
-            Good
-            """, """
-                Too far
-                """);   // Noncompliant
-
-        // Assignment
-        builder = new Builder("""
-            Good
-            """, """
-                Too far
-                """);   // Noncompliant
-
-
-        builder.Build("""
-            Good
-            """,
-                """
-                Too far
-                """);   // Noncompliant
-    }
-
     public static bool Invocation(params object[] args) => true;
 
     [Obsolete("""
         For coverage
         """)]
     public void Coverage() { }
-}
-
-public class Builder
-{
-    public Builder(params object[] args) { }
-    public Builder Build(params object[] args) => this;
-}
-
-public class WithProperty
-{
-    public string First { get; set; }
-    public string Second { get; set; }
 }

@@ -1,5 +1,5 @@
 /*
- * SonarSource :: C# :: Core
+ * SonarSource :: .NET :: Core
  * Copyright (C) 2014-2025 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
@@ -14,9 +14,7 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
-// This class needs to be in this specific package in order to be accessed by other plugins (e.g. sonar-architecture-csharp-frontend-plugin)
-// See https://docs.sonarsource.com/sonarqube-server/latest/extension-guide/developing-a-plugin/plugin-basics/#exposing-apis-to-other-plugins
-package org.sonar.plugins.csharpenterprise.api;
+package org.sonarsource.dotnet.shared.plugins;
 
 import java.util.Collection;
 import org.sonar.api.rule.RuleKey;
@@ -33,22 +31,29 @@ import org.sonarsource.api.sonarlint.SonarLintSide;
  *     }
  *   }
  * </pre>
+ *
+ *  Note: It's possible to convert checkClass to RuleKey using:
+ * <pre>
+ *   {@code
+ *     RuleKey.of(repositoryKey, RuleAnnotationUtils.getRuleKey(checkClass))
+ *   }
+ * </pre>
  */
 @SonarLintSide
 @ServerSide
 public interface ProfileRegistrar {
 
   /**
-   * This method is called on server side and during an analysis to modify the builtin default quality profile for csharp.
+   * This method is called on server side and during an analysis to modify the builtin default quality profile for java.
    */
   void register(RegistrarContext registrarContext);
 
   interface RegistrarContext {
 
     /**
-     * Registers additional rules into the "Sonar Way" default quality profile for the language "csharp".
+     * Registers additional rules into the "Sonar Way" default quality profile for the language "java".
      */
-    void registerDefaultQualityProfileRules(Collection<RuleKey> ruleKeys);
+    void registerDefaultQualityProfileRules(String languageKey, Collection<RuleKey> ruleKeys);
 
   }
 

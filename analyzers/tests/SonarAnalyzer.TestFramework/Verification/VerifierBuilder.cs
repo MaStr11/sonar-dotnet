@@ -36,24 +36,22 @@ public enum CompilationErrorBehavior
 public record VerifierBuilder
 {
     // All properties are (and should be) immutable.
-    public ImmutableArray<Func<DiagnosticAnalyzer>> Analyzers { get; init; } = [];
+    public ImmutableArray<Func<DiagnosticAnalyzer>> Analyzers { get; init; } = ImmutableArray<Func<DiagnosticAnalyzer>>.Empty;
+    public bool AutogenerateConcurrentFiles { get; init; } = true;
     public string BasePath { get; init; }
     public Func<SonarCodeFix> CodeFix { get; init; }
     public string CodeFixedPath { get; init; }
     public string CodeFixedPathBatch { get; init; }
     public string CodeFixTitle { get; init; }
-    public bool ConcurrentAnalysis { get; init; } = !Debugger.IsAttached;
-    public bool AutogenerateConcurrentFiles { get; init; } = !Debugger.IsAttached;
+    public bool ConcurrentAnalysis { get; init; } = true;
     public CompilationErrorBehavior ErrorBehavior { get; init; } = CompilationErrorBehavior.Default;
-    public ImmutableArray<DiagnosticDescriptor> OnlyDiagnostics { get; init; } = [];
+    public ImmutableArray<DiagnosticDescriptor> OnlyDiagnostics { get; init; } = ImmutableArray<DiagnosticDescriptor>.Empty;
     public OutputKind OutputKind { get; init; } = OutputKind.DynamicallyLinkedLibrary;
-    public Func<CompilationOptions, CompilationOptions> CompilationOptionsCustomization { get; init; }
-    public ImmutableArray<string> Paths { get; init; } = [];
-    public ImmutableArray<string> AdditionalSourceFiles { get; init; } = [];
-    public ImmutableArray<ParseOptions> ParseOptions { get; init; } = [];
+    public ImmutableArray<string> Paths { get; init; } = ImmutableArray<string>.Empty;
+    public ImmutableArray<ParseOptions> ParseOptions { get; init; } = ImmutableArray<ParseOptions>.Empty;
     public string ProtobufPath { get; init; }
-    public ImmutableArray<MetadataReference> References { get; init; } = [];
-    public ImmutableArray<Snippet> Snippets { get; init; } = [];
+    public ImmutableArray<MetadataReference> References { get; init; } = ImmutableArray<MetadataReference>.Empty;
+    public ImmutableArray<Snippet> Snippets { get; init; } = ImmutableArray<Snippet>.Empty;
     public string AdditionalFilePath { get; init; }
 
     /// <summary>
@@ -70,9 +68,6 @@ public record VerifierBuilder
 
     public VerifierBuilder AddSnippet(string snippet, string fileName = null) =>
         this with { Snippets = Snippets.Add(new(snippet, fileName)) };
-
-    public VerifierBuilder AddAdditionalSourceFiles(params string[] additionalSourceFiles) =>
-        this with { AdditionalSourceFiles = AdditionalSourceFiles.Concat(additionalSourceFiles).ToImmutableArray() };
 
     /// <summary>
     /// Add a test reference to change the project type to Test project.
@@ -99,9 +94,6 @@ public record VerifierBuilder
 
     public VerifierBuilder WithCodeFixTitle(string codeFixTitle) =>
         this with { CodeFixTitle = codeFixTitle };
-
-    public VerifierBuilder WithCompilationOptionsCustomization(Func<CompilationOptions, CompilationOptions> compilationOptionsCustomization) =>
-        this with { CompilationOptionsCustomization = compilationOptionsCustomization };
 
     public VerifierBuilder WithConcurrentAnalysis(bool concurrentAnalysis) =>
         this with { ConcurrentAnalysis = concurrentAnalysis };

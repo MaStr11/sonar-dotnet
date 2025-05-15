@@ -296,17 +296,3 @@ public class XmlReaderException
         }
     }
 }
-
-// Repro for https://sonarsource.atlassian.net/browse/NET-1468
-public class TestLockClass
-{
-    private readonly object locktarget;
-    private readonly SemaphoreSlim sm;
-    public async Task DoWorkAsync(CancellationToken cancellationToken)
-    {
-        lock (locktarget)
-        {
-            sm.Wait(); // Noncompliant FP
-        }
-    }
-}
