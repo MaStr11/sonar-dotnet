@@ -27,30 +27,12 @@ public sealed class IndentArgument : IndentBase
                 if (ExpectedPosition(c.Node) is { } expected)
                 {
                     Verify(c, expected, c.Node.GetFirstToken(), c.Node);
-                    if (c.Node is ArgumentSyntax argument
-                        && argument.Expression is LambdaExpressionSyntax lambda
-                        && (lambda.Body ?? lambda.ExpressionBody) is { } expressionOrBody)
-                    {
-                        Verify(c, expected, expressionOrBody.GetFirstToken(), expressionOrBody);
-                    }
                 }
             },
-            SyntaxKind.Argument,
-            SyntaxKind.ExpressionElement);
+            SyntaxKind.Argument);
 
-    protected override SyntaxNode NodeRoot(SyntaxNode node, SyntaxNode current)
-    {
-        if (current is ForStatementSyntax)
-        {
-            return node.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault();
-        }
-        else if (current is InvocationExpressionSyntax invocation && invocation.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.OperatorToken.IsFirstTokenOnLine())
-        {
-            return memberAccess.Name;   // Off by one due to the dot
-        }
-        else
-        {
-            return base.NodeRoot(node, current);
-        }
-    }
+    protected override SyntaxNode NodeRoot(SyntaxNode node, SyntaxNode current) =>
+        current is ForStatementSyntax
+            ? node.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault()
+            : base.NodeRoot(node, current);
 }

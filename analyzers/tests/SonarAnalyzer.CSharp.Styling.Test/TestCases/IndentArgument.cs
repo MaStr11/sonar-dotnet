@@ -50,8 +50,7 @@ public class Sample
     public bool ArrowCompliant() =>
         Invocation(
             "Arg",
-            "Another",
-            "One more");
+            "Another");
 
     public bool ArrowNotInScope() =>
         Invocation("Arg", "Another");
@@ -68,14 +67,6 @@ public class Sample
         return Invocation(
             "Arg",
             "Another");
-    }
-
-    public Builder ReturnNested()
-    {
-        return new Builder()
-            .Build(
-                "Arg",
-                    "Too far"); // Noncompliant
     }
 
     public void Invocations()
@@ -95,12 +86,12 @@ public class Sample
             "First",
             "Second");
         Invocation(Invocation(Invocation("First",   // This is bad already for other reasons
-        "Too close",            // Noncompliant {{Indent this argument at line position 13.}}
-            "Good",
-                "Too far")));   // Noncompliant
+                            "Too close",            // Noncompliant {{Indent this argument at line position 33.}}
+                                "Good",
+                                    "Too far")));   // Noncompliant
         Invocation(Invocation(Invocation(
-            "First",
-            "Second")));
+                                "First",
+                                "Second")));
 
         Invocation(
             Invocation(
@@ -117,49 +108,8 @@ public class Sample
             "Second");
 
         Invocation(Invocation(Invocation(   // This is bad already for other reasons
-            "First",
-            "Second")));
-
-        // Simple lambda
-        RegisterNodeAction(c =>
-        {                               // Noncompliant
-        },
-            42);
-        RegisterNodeAction(c => { }, 42);
-        RegisterNodeAction(c =>
-            {
-            },
-            42);
-        // Parenthesized lambda
-        RegisterNodeAction((c) =>
-        {                               // Noncompliant
-        },
-            42);
-        RegisterNodeAction((c) => { }, 42);
-        RegisterNodeAction((c) =>
-            {
-            },
-            42);
-        // Expression-body lambda
-        AcceptFunc(c =>
-        c,                              // Noncompliant
-            42);
-        AcceptFunc(c => c, 42);
-        AcceptFunc(c =>
-            c,
-            42);
-
-}
-
-    public void ObjectInitializer()
-    {
-        _ = new WithProperty
-        {
-            Value = Invocation(
-                "Good",
-            "Too close",        // Noncompliant
-                    "Too far")  // Noncompliant
-        };
+                                "First",
+                                "Second")));
     }
 
     public void Lambdas(int[] list, int[] longer)
@@ -183,7 +133,7 @@ public class Sample
                                 "Good"));   // Compliant, as long as it's after the invocation and aligned to the grid of 4
 
         list.Where(x =>
-        {                                   // Noncompliant
+        {
             return Invocation(
                 "Good");
         });
@@ -199,11 +149,6 @@ public class Sample
         }
         if (Invocation(
                 "Good"))
-        {
-        }
-        else if (Invocation(
-                    "Good",
-                        "Too far")) // Noncompliant
         {
         }
     }
@@ -236,25 +181,6 @@ public class Sample
         }
     }
 
-    public void ConditionalAccess(Builder builder)
-    {
-        builder?
-            .Build(
-            "Too close",            // Noncompliant
-                "Good");
-
-        builder?
-            .Build(
-            "Too close",            // Noncompliant
-                "Good")?
-            .Build(
-            "Too close",            // Noncompliant
-                "Good");
-        builder?.Build()?.Build(
-        "Too close",                // Noncompliant
-            "Good");
-    }
-
     public void Global()
     {
         global::Sample.Invocation(
@@ -266,48 +192,9 @@ public class Sample
             "Second");
     }
 
-    public void SwitchExpressions(object arg)
-    {
-        _ = arg switch
-        {
-            Exception someLongerName => Invocation( // This is already bad
-                "Good",
-                    "Too far"), // Noncompliant
-            _ => Invocation(
-                "Good",
-                    "Too far"), // Noncompliant
-        };
-    }
-
-    public void OtherSyntaxes()
-    {
-        _ = new int[
-            1,
-        2,          // FN, we don't care. Nobody should specify array ranks on multiple lines
-                3
-            ];
-        int[] array = [
-            1,
-        2,          // Noncompliant
-                3   // Noncompliant
-            ];
-    }
-
     public static bool Invocation(params object[] args) => true;
     public static string ReturnString(string arg) => arg;
-    public void RegisterNodeAction(Action<object> action, params object[] syntaxKinds) { }
-    public void AcceptFunc(Func<object, object> func, params object[] args) { }
 
     [Obsolete(ReturnString("For coverage"))]    // Error [CS0182] An attribute argument must be a constant expression
     public void Coverage() { }
-}
-
-public class Builder
-{
-    public Builder Build(params object[] args) => this;
-}
-
-public class WithProperty
-{
-    public object Value { get; set; }
 }

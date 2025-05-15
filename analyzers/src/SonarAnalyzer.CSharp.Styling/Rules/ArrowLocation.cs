@@ -31,7 +31,7 @@ public sealed class ArrowLocation : StylingAnalyzer
 
     private void Verify(SonarSyntaxNodeReportingContext context, SyntaxToken arrowToken)
     {
-        if (!arrowToken.IsMissing && arrowToken.IsFirstTokenOnLine())
+        if (!arrowToken.IsMissing && arrowToken.Line() > arrowToken.GetPreviousToken().Line())
         {
             context.ReportIssue(Rule, arrowToken);
         }

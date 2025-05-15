@@ -21,9 +21,7 @@ namespace SonarAnalyzer.Test.Rules
     [TestClass]
     public class ConsumeValueTaskCorrectlyTest
     {
-        private readonly VerifierBuilder builder = new VerifierBuilder<ConsumeValueTaskCorrectly>()
-            .AddReferences(MetadataReferenceFacade.SystemThreadingTasks)
-            .AddReferences(MetadataReferenceFacade.SystemMemory);
+        private readonly VerifierBuilder builder = new VerifierBuilder<ConsumeValueTaskCorrectly>().AddReferences(MetadataReferenceFacade.SystemThreadingTasks);
 
         [TestMethod]
         public void ConsumeValueTaskCorrectly() =>
