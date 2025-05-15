@@ -84,30 +84,17 @@ public sealed class IndentOperator : IndentBase
     }
 
     protected override int Offset(SyntaxNode node, SyntaxNode root) =>
-        CoalesceRoot(node) == root
+        node == root
             ? 3     // When rooted from the same expression, align itself to the same expression from the previous line
             : 4;    // Otherwise force one tab, like in the base class
 
     protected override SyntaxNode NodeRoot(SyntaxNode node, SyntaxNode current)
     {
-        if (current is ArrowExpressionClauseSyntax { Parent: AccessorDeclarationSyntax })
+        if (current is ArrowExpressionClauseSyntax or LambdaExpressionSyntax or ConditionalExpressionSyntax or ForStatementSyntax)
         {
-            return current.Parent;
+            return node;
         }
-        else if (current is ArrowExpressionClauseSyntax or LambdaExpressionSyntax or ConditionalExpressionSyntax { Parent: not ReturnStatementSyntax } or ForStatementSyntax)
-        {
-            return CoalesceRoot(node);
-        }
-        else if (current is IfStatementSyntax { Parent: ElseClauseSyntax })
-        {
-            return null;
-        }
-        else if (current is ElseClauseSyntax)
-        {
-            return current;
-        }
-        else if (current is StatementSyntax or AssignmentExpressionSyntax or SwitchExpressionArmSyntax
-            || (current is InvocationExpressionSyntax && current.GetFirstToken().IsFirstTokenOnLine()))
+        else if (current is StatementSyntax)
         {
             return current;
         }
@@ -119,15 +106,5 @@ public sealed class IndentOperator : IndentBase
         {
             return null;
         }
-    }
-
-    private static SyntaxNode CoalesceRoot(SyntaxNode node)
-    {
-        // Coalesce expressions have right-associative tree, so the trick of returning "node" itself as the starting point doesn't work. We need to find the first in 'first ?? node ?? last'
-        while (node.Parent.IsKind(SyntaxKind.CoalesceExpression))
-        {
-            node = node.Parent;
-        }
-        return node;
     }
 }

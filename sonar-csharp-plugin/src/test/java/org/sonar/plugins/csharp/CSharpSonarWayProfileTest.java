@@ -35,7 +35,7 @@ class CSharpSonarWayProfileTest {
   @BeforeAll
   static void setup() {
     Context context = new Context();
-    CSharpSonarWayProfile profileDef = new CSharpSonarWayProfile(CSharpPlugin.METADATA, ROSLYN_RULES, null);
+    CSharpSonarWayProfile profileDef = new CSharpSonarWayProfile(CSharpPlugin.METADATA, ROSLYN_RULES);
     profileDef.define(context);
     profile = context.profile("cs", "Sonar way");
   }

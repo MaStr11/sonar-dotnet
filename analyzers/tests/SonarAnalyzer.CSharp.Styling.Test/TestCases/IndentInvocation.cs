@@ -61,22 +61,10 @@ public class Sample
 
     public Builder ArrowCompliant() =>
         builder
-            .Build()
-            .Build()
             .Build();
 
     public Builder ArrowNotInScope() =>
         builder.Build();
-
-    public object ArrowInInvocationArgument() =>
-        Something(builder
-        .Build()        // Noncompliant
-            .Build());
-
-    public object ArrowInConstructorArgument() =>
-        new Exception(builder
-        .Build()    // Noncompliant
-            .ToString());
 
     public Builder ReturnNoncompliant()
     {
@@ -94,55 +82,31 @@ public class Sample
             .Build("Are we sure it's really built?");
     }
 
-    public bool ReturnNestedExpressions()
-    {
-        return true
-            && true
-            && builder
-                .Build()
-                    .IsTrue();   // Noncompliant
-    }
-
-    public bool ArrowNestedExpressions() =>
-        true
-        && true
-        && builder
-            .Build()
-                .IsTrue();   // Noncompliant
-
-    public object ArrowNestedExpressionTernary() =>
-        true
-        && true
-            ? builder
-                .Build()
-                    .Build()    // Noncompliant
-            : null;
-
     public void Invocations()
     {
         Something(builder
-        .Build()            // Noncompliant {{Indent this member access at line position 13.}}
-                .Build(),   // Noncompliant, too far
+        .Build()            // Noncompliant {{Indent this member access at line position 21.}}
+            .Build(),       // Noncompliant, too close as well
             "Some other argument");
         Something(builder   // This is bad already
-            .Build()
-            .Build(),
+                    .Build()
+                    .Build(),
             "Some other argument");
         global::Sample.Something(builder    // This is bad already
-                .Build()    // Noncompliant {{Indent this member access at line position 13.}}
+                .Build()    // Noncompliant {{Indent this member access at line position 37.}}
                 .Build(),   // Noncompliant
             "Some other argument");
         global::Sample.Something(builder  // This is bad already
-            .Build()
-            .Build(),
+                                    .Build()
+                                    .Build(),
             "Some other argument");
         Something(Something(Something(builder // This is bad already
-                .Build()    // Noncompliant {{Indent this member access at line position 13.}}
+                .Build()    // Noncompliant {{Indent this member access at line position 41.}}
                 .Build(),   // Noncompliant
             "Some other argument")));
         Something(Something(Something(builder // This is bad already
-            .Build()
-            .Build(),
+                                        .Build()
+                                        .Build(),
             "Some other argument")));
 
         Something(
@@ -167,17 +131,6 @@ public class Sample
                 .Build()
                 .Build(),
             "Some other argument")));
-    }
-
-    public void ObjectInitializer()
-    {
-        _ = new Builder
-        {
-            Variable = builder.Build()
-                .Build()
-            .Build()            // Noncompliant
-                    .Build()    // Noncompliant
-        };
     }
 
     public void Lambdas(int[] list, int[] longer)
@@ -218,12 +171,6 @@ public class Sample
                 .IsTrue())
         {
         }
-        else if (builder
-                    .Build()
-                        .IsTrue())  // Noncompliant
-        {
-        }
-
     }
 
     public void While()
@@ -278,7 +225,7 @@ public class Sample
             .StaticMethod();
     }
 
-    public void NestedClasses()
+    public void Nested()
     {
         Builder.NestedOnce
                 .StaticMethod();    // Noncompliant
@@ -288,23 +235,6 @@ public class Sample
                 .StaticMethod();    // Noncompliant
         Builder.NestedOnce.NestedTwice
             .StaticMethod();
-    }
-
-    public void SwitchExpressions(object arg)
-    {
-        _ = arg switch
-        {
-            ArgumentException someLongerName =>
-                builder
-                    .Build()
-                        .Build(),   // Noncompliant
-            Exception someLongerName => builder
-                .Build()
-                    .Build(),       // Noncompliant
-            _ => builder
-                .Build()
-                    .Build()        // Noncompliant
-        };
     }
 
     public static bool Something(object arg, object another = null) => true;

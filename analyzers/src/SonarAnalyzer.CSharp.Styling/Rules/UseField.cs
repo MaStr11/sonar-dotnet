@@ -14,8 +14,6 @@
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 
-using static Microsoft.CodeAnalysis.Accessibility;
-
 namespace SonarAnalyzer.CSharp.Styling.Rules;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -27,7 +25,7 @@ public sealed class UseField : StylingAnalyzer
         context.RegisterNodeAction(c =>
             {
                 var property = (PropertyDeclarationSyntax)c.Node;
-                if (c.ContainingSymbol is IPropertySymbol { DeclaredAccessibility: Private or Protected or ProtectedAndInternal, IsAbstract: false, IsVirtual: false, IsOverride: false }
+                if (c.ContainingSymbol is IPropertySymbol { DeclaredAccessibility: Accessibility.Private or Accessibility.Protected or Accessibility.ProtectedAndInternal }
                     && property.AccessorList is { } accessors
                     && accessors.Accessors.All(x => x.Body is null && x.ExpressionBody is null))
                 {

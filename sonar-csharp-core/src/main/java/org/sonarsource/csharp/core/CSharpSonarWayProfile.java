@@ -22,8 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.rule.RuleKey;
-import org.sonar.plugins.csharpenterprise.api.ProfileRegistrar;
 import org.sonarsource.dotnet.shared.plugins.AbstractSonarWayProfile;
 import org.sonarsource.dotnet.shared.plugins.PluginMetadata;
 import org.sonarsource.dotnet.shared.plugins.RoslynRules;
@@ -31,17 +29,8 @@ import org.sonarsource.dotnet.shared.plugins.RoslynRules;
 public class CSharpSonarWayProfile extends AbstractSonarWayProfile {
   private static final Logger LOG = LoggerFactory.getLogger(CSharpSonarWayProfile.class);
 
-  private final ProfileRegistrar[] profileRegistrars;
-
-  // The constructors cannot be merged because SonarQube Cloud does not support dependency injection for @Nullable arguments.
   public CSharpSonarWayProfile(PluginMetadata metadata, RoslynRules roslynRules) {
     super(metadata, roslynRules);
-    this.profileRegistrars = null;
-  }
-
-  public CSharpSonarWayProfile(PluginMetadata metadata, RoslynRules roslynRules, ProfileRegistrar[] profileRegistrars) {
-    super(metadata, roslynRules);
-    this.profileRegistrars = profileRegistrars;
   }
 
   @Override
@@ -49,9 +38,7 @@ public class CSharpSonarWayProfile extends AbstractSonarWayProfile {
     final String securityRepositoryKey = getSecurityRepositoryKey();
     try {
       getSecurityRuleKeys().forEach(key -> sonarWay.activateRule(securityRepositoryKey, key));
-    } catch (
-      IllegalArgumentException |
-      IllegalStateException e) {
+    } catch (IllegalArgumentException | IllegalStateException e) {
       LOG.warn("Could not activate C# security rules", e);
     }
   }
@@ -61,14 +48,10 @@ public class CSharpSonarWayProfile extends AbstractSonarWayProfile {
       Class<?> csRulesClass = Class.forName("com.sonar.plugins.security.api.CsRules");
       Method getRuleKeysMethod = csRulesClass.getMethod("getRuleKeys");
       return (Set<String>) getRuleKeysMethod.invoke(null);
-    } catch (
-      ClassNotFoundException |
-      NoSuchMethodException e) {
+    } catch (ClassNotFoundException | NoSuchMethodException e) {
       LOG.debug("com.sonar.plugins.security.api.CsRules#getRuleKeys is not found, no security rules added to Sonar way cs profile: {}",
         e.getMessage());
-    } catch (
-      IllegalAccessException |
-      InvocationTargetException e) {
+    } catch (IllegalAccessException | InvocationTargetException e) {
       LOG.debug("[{}] No security rules added to Sonar way cs profile: {}", e.getClass().getName(), e.getMessage());
     }
 
@@ -80,27 +63,10 @@ public class CSharpSonarWayProfile extends AbstractSonarWayProfile {
       Class<?> csRulesClass = Class.forName("com.sonar.plugins.security.api.CsRules");
       Method getRepositoryKeyMethod = csRulesClass.getMethod("getRepositoryKey");
       return (String) getRepositoryKeyMethod.invoke(null);
-    } catch (
-      ClassNotFoundException |
-      NoSuchMethodException |
-      IllegalAccessException |
-      InvocationTargetException e) {
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
       LOG.debug("com.sonar.plugins.security.api.CsRules#getRepositoryKey is not found, will use default repository key: {}",
         e.getMessage());
     }
     return metadata.repositoryKey();
-  }
-
-  @Override
-  protected void registerRulesFromRegistrars(NewBuiltInQualityProfile profile) {
-    if (profileRegistrars != null) {
-      for (var profileRegistrar : profileRegistrars) {
-        profileRegistrar.register(rules -> {
-          for (RuleKey ruleKey : rules) {
-            profile.activateRule(ruleKey.repository(), ruleKey.rule());
-          }
-        });
-      }
-    }
   }
 }

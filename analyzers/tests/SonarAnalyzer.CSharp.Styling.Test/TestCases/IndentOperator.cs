@@ -4,7 +4,6 @@ using System.Linq;
 public class Sample
 {
     private bool condition;
-    private object first, middle, last;
 
     public void Method()
     {
@@ -39,41 +38,14 @@ public class Sample
 
     public bool ArrowNoncompliant() =>
         condition
-            && true     // Noncompliant {{Indent this operator at line position 9.}}
-            && true;    // Noncompliant
+            && true;    // Noncompliant {{Indent this operator at line position 9.}}
 
     public bool ArrowCompliant() =>
         condition
-        && true
-        && true
         && true;
-
-    public object ArrowNullCoalescing() =>
-        first
-        ?? middle
-        ?? middle
-            ?? last;    // Noncompliant
 
     public bool ArrowNotInScope() =>
         condition && true;
-
-    public object ArrowInInvocationArgument() =>
-        Something(condition
-            && true
-            && true
-                && true);   // Noncompliant
-
-    public object ArrowInInvocationArgumentStartsOnNextLIne() =>
-        Something(
-            condition
-            && true
-            && true
-                && true);   // Noncompliant
-
-    public object ArrowInConstructorArgument() =>
-        new Nullable<bool>(condition
-                        && true     // Noncompliant
-                            && true);
 
     public bool ReturnNoncompliant()
     {
@@ -84,16 +56,7 @@ public class Sample
     public bool ReturnCompliant()
     {
         return condition
-            && true
             && true;
-    }
-
-    public bool ReturnTernary()
-    {
-        return condition
-            && true
-                ? true
-                : false;
     }
 
     public void Invocations()
@@ -139,17 +102,6 @@ public class Sample
             "Some other argument")));
     }
 
-    public void ObjectInitializer()
-    {
-        _ = new WithProperty
-        {
-            Value = condition
-                && true
-            && true             // Noncompliant
-                    && true     // Noncompliant
-        };
-    }
-
     public void Lambdas(int[] list, int[] longer)
     {
         list.Where(x => condition
@@ -159,8 +111,6 @@ public class Sample
                                 && true // Noncompliant, too far
                              && true);  // Noncompliant, too far
         list.Where(x => condition       // Simple lambda
-                        && true
-                        && true
                         && true);
         list.Where((x) => condition     // Parenthesized lambda
                             && true
@@ -169,10 +119,6 @@ public class Sample
                             && true);   // Compliant, as long as it's after the condition and aligned to the grid of 4
         longer.Where((x) => condition   // Parenthesized lambda, longer name
                             && true);   // Compliant, as long as it's after the condition and aligned to the grid of 4
-        list.Select(xxxx => first
-                            ?? middle
-                            ?? middle
-                                ?? last);   // Noncompliant
         list.Where(x =>
         {
             return condition
@@ -190,11 +136,6 @@ public class Sample
         if (condition
             && true
             && true)
-        {
-        }
-        else if (condition
-            && true
-                && true)    // Noncompliant
         {
         }
     }
@@ -223,24 +164,16 @@ public class Sample
         for (int i = 0; condition
                         && true; i++)
         { }
-        for (int i = 0; condition
-                        && true
-                        && true; i++)
-        { }
         for (int ii = 0; condition
-                            && true
                             && true; ii++)
         { }
         for (int iii = 0; condition
-                            && true
                             && true; iii++)
         { }
         for (int iiii = 0; condition
-                            && true
                             && true; iiii++)
         { }
         for (int iiiii = 0; condition
-                            && true
                             && true; iiiii++)
         { }
     }
@@ -293,66 +226,11 @@ public class Sample
                     is true));
     }
 
-    public void ConditionalAccess(Builder builder)
-    {
-        builder?
-            .Build(true
-                || false
-                    || false);           // Noncompliant
-
-        builder?
-            .Build(true
-                || false
-                    || false)?           // Noncompliant
-            .Build(true
-                || false
-                    || false);           // Noncompliant
-        builder?.Build()?.Build(true
-            || false
-                || false);               // Noncompliant
-    }
-
-    public void SwitchExpressions(object arg)
-    {
-        _ = arg switch
-        {
-            Exception someLongerName => condition
-                && true
-                    && true,            // Noncompliant
-            _ => condition
-                && true
-                    && true             // Noncompliant
-        };
-    }
-
-    public object Property =>
-        first
-        ?? middle
-        ?? middle
-            ?? last;  // Noncompliant
-
-    public object AccessorCoalesce
-    {
-        get => first
-            ?? middle
-            ?? middle
-                ?? last;  // Noncompliant
-    }
-
-    public bool Accessor
-    {
-        get => condition
-            && true
-                && true;    // Noncompliant
-    }
-
     public static bool Something(bool arg, object another = null) => true;
 }
 
 class Operators
 {
-    object first, middle, last;
-
     void LogicalOperator(bool a, bool b)
     {
         _ = a
@@ -399,22 +277,12 @@ class Operators
                 && false
             : false
                 || true;
-
-        _ = true
-            ? first
-                ?? middle
-                ?? middle
-                    ?? last     // Noncompliant
-            : null;
     }
 
-    void Coelesce(object o1, object o2, object o3)
+    void Coelesce(object o1, object o2)
     {
         _ = o1
-            ?? o2
-            ?? o2
-            ?? o2
-                ?? o3;      // Noncompliant
+                ?? o2;      // Noncompliant
     }
 
     void AsIs(object o)
@@ -486,11 +354,6 @@ class Operators
     }
 }
 
-public class WithProperty
-{
-    public bool Value { get; set; }
-}
-
 public class Coverage
 {
     [Obsolete("For" + " coverage", true is true or true)]   // Error [CS0182] An attribute argument must be a constant expression
@@ -498,9 +361,4 @@ public class Coverage
 
     [Obsolete(1..2)]    // Error [CS1503] Argument 1: cannot convert from 'System.Range' to 'string?'
     public void RangeOperator() { }
-}
-
-public class Builder
-{
-    public Builder Build(params object[] args) => this;
 }

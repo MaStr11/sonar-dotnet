@@ -24,7 +24,7 @@ public abstract class IndentBase : StylingAnalyzer
 
     protected void Verify(SonarSyntaxNodeReportingContext context, int expected, SyntaxToken token, SyntaxNode reportingLocationExpression = null)
     {
-        if (token.IsFirstTokenOnLine() // Raise only when the line starts with this token to avoid collisions with T0024, T0027, etc.
+        if (token.Line() != token.GetPreviousToken().Line() // Raise only when the line starts with this token to avoid collisions with T0024, T0027, etc.
             && token.GetLocation().GetLineSpan().StartLinePosition.Character != expected)
         {
             context.ReportIssue(Rule, Location.Create(token.SyntaxTree, TextSpan.FromBounds(token.SpanStart, (reportingLocationExpression?.Span ?? token.Span).End)), (expected + 1).ToString());
@@ -36,11 +36,8 @@ public abstract class IndentBase : StylingAnalyzer
 
     protected int? ExpectedPosition(SyntaxNode node) =>
         StatementRoot(node) is { } root
-            ? ExpectedPosition(root.GetLocation().GetLineSpan().StartLinePosition.Character, Offset(node, root))
+            ? (root.GetLocation().GetLineSpan().StartLinePosition.Character + Offset(node, root)) / 4 * 4    // Nearest next tab distance
             : null;
-
-    protected static int ExpectedPosition(int character, int offset) =>
-        (character + offset) / 4 * 4;   // Nearest next tab distance
 
     protected virtual SyntaxNode NodeRoot(SyntaxNode node, SyntaxNode current)
     {
@@ -48,10 +45,9 @@ public abstract class IndentBase : StylingAnalyzer
         {
             return node;    // Root from the original node itself (ternary, binary, ...)
         }
-        else if (current is StatementSyntax or AssignmentExpressionSyntax or SwitchExpressionArmSyntax
+        else if (current is StatementSyntax
             || current is ExpressionSyntax { Parent: IfStatementSyntax or WhileStatementSyntax }
-            || current.Parent is ArrowExpressionClauseSyntax or LambdaExpressionSyntax
-            || (current is InvocationExpressionSyntax && current.GetFirstToken().IsFirstTokenOnLine()))
+            || current.Parent is ArrowExpressionClauseSyntax or ArgumentSyntax or LambdaExpressionSyntax)
         {
             return current;
         }

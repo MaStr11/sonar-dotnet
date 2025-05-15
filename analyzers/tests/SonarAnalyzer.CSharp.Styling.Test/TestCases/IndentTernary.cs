@@ -42,11 +42,6 @@ public class Sample
             ? true
              : false;   // Noncompliant
 
-        longVariableName = condition
-            && true
-                ? true
-                    : false;    // Noncompliant
-
         longVariableName = condition ? true : false;
         longVariableName = condition
             ? true : false;     // Compliant, this is T0024
@@ -64,30 +59,8 @@ public class Sample
             ? true
             : false;
 
-    public bool ArrowLongerCondition() =>
-        condition
-        && true
-            ? true
-                : false;    // Noncompliant
-
     public bool ArrowNotInScope() =>
         condition ? true : false;
-
-    public object ArrowInInvocationArgument() =>
-        Something(condition
-        ? true          // Noncompliant
-            : false);
-
-    public object ArrowInInvocationArgumentLongerCondition() =>
-        Something(condition
-            && true
-            ? true          // Noncompliant
-                : false);
-
-    public object ArrowInConstructorArgument() =>
-        new Nullable<bool>(condition
-        ? true  // Noncompliant
-            : false);
 
     public bool ReturnNoncompliant()
     {
@@ -103,43 +76,31 @@ public class Sample
             : false;
     }
 
-    public bool ReturnLongerCondition()
-    {
-        return condition
-            && true
-                ? true
-                    : false;    // Noncompliant
-        return (condition
-            && true)
-                ? true
-                    : false;    // FN, we're only looking for binary expression at top level
-    }
-
     public void Invocations()
     {
         Something(condition // This is bad already
-        ? true              // Noncompliant {{Indent this ternary at line position 13.}}
-            : false,
+        ? true              // Noncompliant {{Indent this ternary at line position 21.}}
+            : false,        // Noncompliant, too close as well
             "Some other argument");
         Something(condition // This is bad already
-            ? true
-            : false,
+                    ? true
+                    : false,
             "Some other argument");
         global::Sample.Something(condition  // This is bad already
-                ? true      // Noncompliant {{Indent this ternary at line position 13.}}
+                ? true      // Noncompliant {{Indent this ternary at line position 37.}}
                 : false,    // Noncompliant
             "Some other argument");
         global::Sample.Something(condition  // This is bad already
-            ? true
-            : false,
+                                    ? true
+                                    : false,
             "Some other argument");
         Something(Something(Something(condition // This is bad already
-                ? true      // Noncompliant {{Indent this ternary at line position 13.}}
+                ? true      // Noncompliant {{Indent this ternary at line position 41.}}
                 : false,    // Noncompliant
             "Some other argument")));
         Something(Something(Something(condition // This is bad already
-            ? true
-            : false,
+                                        ? true
+                                        : false,
             "Some other argument")));
 
         Something(
@@ -164,26 +125,6 @@ public class Sample
                 ? true
                 : false,
             "Some other argument")));
-
-        Something(condition
-            && true
-                ? true
-                    : false);    // Noncompliant)
-        Something(
-            condition
-            && true
-                ? true
-                    : false);    // Noncompliant)
-    }
-
-    public void ObjectInitializer()
-    {
-        _ = new WithProperty
-        {
-            Value = condition
-                ? true
-            :false              // Noncompliant
-        };
     }
 
     public void Lambdas(int[] list, int[] longer)
@@ -229,17 +170,6 @@ public class Sample
                 : false)
         {
         }
-        else if (condition
-                    ? true
-                        : false)    // Noncompliant
-        {
-        }
-        if(condition
-            && true
-                ? true
-                    : false)    // Noncompliant
-        {
-        }
     }
 
     public void While()
@@ -270,54 +200,8 @@ public class Sample
         }
     }
 
-    public void ConditionalAccess(Builder builder)
-    {
-        builder?
-            .Build(condition
-                ? true
-                    : false);       // Noncompliant
-
-        builder?
-            .Build(condition
-                ? true
-                    : false)?       // Noncompliant
-            .Build(condition
-                ? true
-                    : false);       // Noncompliant
-        builder?.Build()?.Build(condition
-            ? true
-                : false);           // Noncompliant
-    }
-
-    public void SwitchExpressions(object arg)
-    {
-        _ = arg switch
-        {
-            ArgumentException someLongerName => condition
-                && true
-                    ? true
-                        : false,        // Noncompliant
-            Exception someLongerName => condition
-                ? true
-                    : false,        // Noncompliant
-            _ => condition
-                ? true
-                    : false         // Noncompliant
-        };
-    }
-
     [Obsolete(true  // Not supported, used for coverage
     ? "true"
     : "false")]
     public static bool Something(bool arg, object another = null) => true;
-}
-
-public class Builder
-{
-    public Builder Build(params object[] args) => this;
-}
-
-public class WithProperty
-{
-    public bool Value { get; set; }
 }

@@ -46,10 +46,8 @@ import org.sonarsource.dotnet.shared.plugins.sensors.FileTypeSensor;
 import org.sonarsource.dotnet.shared.plugins.sensors.LogSensor;
 import org.sonarsource.dotnet.shared.plugins.sensors.MethodDeclarationsSensor;
 import org.sonarsource.dotnet.shared.plugins.sensors.PropertiesSensor;
-import org.sonarsource.dotnet.shared.plugins.sensors.TelemetryJsonSensor;
 import org.sonarsource.dotnet.shared.plugins.sensors.TelemetryProcessor;
 import org.sonarsource.dotnet.shared.plugins.sensors.TelemetrySensor;
-import org.sonarsource.dotnet.shared.plugins.telemetryjson.TelemetryJsonCollector;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.sonarsource.dotnet.shared.PropertyUtils.nonProperties;
@@ -72,8 +70,6 @@ class CSharpCoreExtensionsTest {
       TelemetryCollector.class,
       TelemetrySensor.class,
       TelemetryProcessor.class,
-      TelemetryJsonCollector.class,
-      TelemetryJsonSensor.class,
       RealPathProvider.class,
       PropertiesSensor.class,
       ProjectTypeCollector.class,
